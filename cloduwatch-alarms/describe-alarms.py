@@ -18,7 +18,7 @@ def describe_alarms(alarm_prefix):
         common.info("Threshold: " + str(item['Threshold']))
 
         pprint.pprint(item)
-        sys.exit(0)
+        #sys.exit(0)
 
 
 

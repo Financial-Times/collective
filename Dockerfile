@@ -3,6 +3,6 @@ MAINTAINER 'Jussi Heinonen<jussi.heinonen@ft.com>'
 
 RUN apk add -U py-pip && pip install --upgrade pip && \
     apk add python-dev bash curl bind-tools  && \
-    pip install --upgrade boto3 requests
+    pip install --upgrade boto3 requests pyyaml
 
 CMD /bin/bash
