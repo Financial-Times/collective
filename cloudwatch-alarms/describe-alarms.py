@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys, boto3, pprint
+import sys, boto3, pprint, argparse
 from json import loads
 import common
 
@@ -17,7 +17,7 @@ def describe_alarms(alarm_prefix):
         common.info("ComparisonOperator: " + item['ComparisonOperator'])
         common.info("Threshold: " + str(item['Threshold']))
 
-        pprint.pprint(item)
+        #pprint.pprint(item)
         #sys.exit(0)
 
 
@@ -25,8 +25,14 @@ def describe_alarms(alarm_prefix):
 def usage():
     common.info("USAGE: " + sys.argv[0] + " namespace")
     sys.exit(0)
+
+parser = argparse.ArgumentParser(description='List CloudWatch alarms with given name prefix')
+parser.add_argument('--namespace', help='Alarm namespace, eg. com.ft.up.prod-uk-data', required=True)
+
+args = parser.parse_args()
+
 if len(sys.argv) < 2:
 
     usage()
 else:
-    describe_alarms(sys.argv[1])
+    describe_alarms(args.namespace)

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys, boto3, pprint, yaml
+import sys, boto3, pprint, yaml, argparse
 from json import loads
 import common
 alarms_file = 'alarms.yml'
@@ -38,21 +38,24 @@ def put_metric_alarm(namepace, instance_id, description, actions, metric_name, t
             return False
     pprint.pprint(response)
 
-def usage():
-    common.info("USAGE: " + sys.argv[0] + " namespace instance-id")
-    sys.exit(0)
-if len(sys.argv) < 3:
-    usage()
-else:
-    namespace = sys.argv[1]
-    instance_id = sys.argv[2]
-    try:
-        with open(alarms_file, 'r') as ymlfile:
-            cfg = yaml.load(ymlfile)
-        common.info("File " + alarms_file + " loaded")
-        for each in cfg.itervalues():
-            put_metric_alarm(namespace, instance_id, each['AlarmDescription'], each['AlarmActions'], each['MetricName'], each['Threshold'],  each['Statistic'], each['ComparisonOperator'], each['PluginInstance'])
-    except Exception, e:
-        common.error("Error while creating alarms: " + str(e))
-        sys.exit(1)
-    #put_metric_alarm(sys.argv[1])
+parser = argparse.ArgumentParser(description='Create CloudWatch alarms with given name prefix')
+parser.add_argument('--namespace', help='Alarm namespace, eg. com.ft.up.semantic-data.neo4j', required=True)
+parser.add_argument('--instanceid', help='InstanceID, eg. i-0fc52a4ca4d81b5b4', required=True)
+parser.add_argument('--topic', help='ARN of SNS Topic to send alerts to, eg. arn:aws:sns:eu-west-1:027104099916:SemanticMetadata', required=False)
+
+args = parser.parse_args()
+
+namespace = args.namespace
+instance_id = args.instanceid
+try:
+    with open(alarms_file, 'r') as ymlfile:
+        cfg = yaml.load(ymlfile)
+    common.info("File " + alarms_file + " loaded")
+    for each in cfg.itervalues():
+        if args.topic: #Override AlarmActions if --topic is passed in as a parameter
+            common.info("Using override topic " + args.topic)
+            each['AlarmActions'] = [ args.topic ]
+        put_metric_alarm(namespace, instance_id, each['AlarmDescription'], each['AlarmActions'], each['MetricName'], each['Threshold'],  each['Statistic'], each['ComparisonOperator'], each['PluginInstance'])
+except Exception, e:
+    common.error("Error while creating alarms: " + str(e))
+    sys.exit(1)
