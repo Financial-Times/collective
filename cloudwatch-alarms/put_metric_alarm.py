@@ -8,7 +8,8 @@ def put_metric_alarm(namepace, instance_id, description, actions, metric_name, t
     client = boto3.client('cloudwatch')
     response = client.put_metric_alarm(
         AlarmName=namepace + "." + instance_id + "." + metric_name + "." + plugin_instance,
-        AlarmDescription=description + ". Instance-id " + instance_id + ".",
+        AlarmDescription=description + " Instance-id " + instance_id + ".",
+        OKActions=actions,
         AlarmActions=actions,
         ActionsEnabled=True,
         MetricName=metric_name,
