@@ -5,7 +5,6 @@
 Script to create or modify existing CloudWatch alarms
 
 usage: put_metric_alarm.py --help
-
 Author: Jussi Heinonen
 Date: 9.3.2017
 URL: https://github.com/Financial-Times/collective
@@ -91,7 +90,10 @@ try:
     for each in cfg.itervalues():
         if args.topic: #Override AlarmActions if --topic is passed in as a parameter
             common.info("Using override topic " + args.topic)
-            each['AlarmActions'] = [ args.topic ]        
+            each['AlarmActions'] = [ args.topic ]
+        elif not 'AlarmActions' in each: # Disable email alarms by setting invalid SNS Topic ARN
+            sns_topic = common.construct_invalid_sns_topic()
+            each['AlarmActions'] = [ sns_topic ]
         put_metric_alarm(namespace, instance_id, each['AlarmDescription'], each['AlarmActions'], each['MetricName'], each['Threshold'],  each['Statistic'], each['ComparisonOperator'], each['PluginInstance'])
 except Exception, e:
     common.error("Error while creating alarms: " + str(e))
