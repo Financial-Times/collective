@@ -8,4 +8,4 @@ def info(input):
     print '        ' + ok + input + endc
 
 def error(input):
-    print '        ' + fail + input + endc
+    print '        ' + fail + 'ERROR: ' + input + endc
