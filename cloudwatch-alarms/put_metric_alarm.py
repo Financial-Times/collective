@@ -23,6 +23,7 @@ def put_metric_alarm(namepace, instance_id, description, actions, metric_name, t
         AlarmDescription=description + " Instance-id " + instance_id + ".",
         OKActions=actions,
         AlarmActions=actions,
+        InsufficientDataActions=actions,
         ActionsEnabled=True,
         MetricName=metric_name,
         Namespace=namespace,
