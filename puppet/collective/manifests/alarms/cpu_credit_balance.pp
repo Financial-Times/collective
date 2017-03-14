@@ -41,11 +41,9 @@ $aws_region       = 'eu-west-1'
   ->
   file { "$aws_dir": ensure => directory }
   ->
-  if $::virtual != 'docker' {
-    exec { 'set-aws-region':
-      command => "echo \"region = $(curl -s --connect-timeout 3 http://169.254.169.254/latest/dynamic/instance-identity/document | grep region | cut -d '\"' -f 4)\" > $aws_dir/credentials",
-      unless  => "test -f ${aws_dir}/credentials"
-    }
+  exec { 'set-aws-region':
+    command => "echo \"region = $(curl -s --connect-timeout 3 http://169.254.169.254/latest/dynamic/instance-identity/document | grep region | cut -d '\"' -f 4)\" > $aws_dir/config",
+    unless  => "test -f ${aws_dir}/config"
   }
   ->
   exec { 'create-alarm':
