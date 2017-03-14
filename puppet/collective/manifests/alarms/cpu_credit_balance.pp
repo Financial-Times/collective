@@ -41,25 +41,15 @@ $aws_region       = 'eu-west-1'
   ->
   file { "$aws_dir": ensure => directory }
   ->
-  if $::virtual == 'docker' {
+  if $::virtual != 'docker' {
     exec { 'set-aws-region':
-      command => "echo \"region = ${aws_region}\" > $aws_dir/credentials",
+      command => "echo \"region = $(curl -s --connect-timeout 3 http://169.254.169.254/latest/dynamic/instance-identity/document | grep region | cut -d '\"' -f 4)\" > $aws_dir/credentials",
       unless  => "test -f ${aws_dir}/credentials"
-    }
-    ->
-    exec { 'create-alarm':
-      command => "python ${workdir}/put_metric_alarm.py --namespace ${namespace} --instanceid i-021a85c54c78f4530 --config ${workdir}/alarm.yml",
     }
   }
-  else {
-    exec { 'set-aws-region':
-      command => "echo \"region = $(curl -s --connect-timeout http://169.254.169.254/latest/dynamic/instance-identity/document | grep region | cut -d '\"' -f 4)\" > $aws_dir/credentials",
-      unless  => "test -f ${aws_dir}/credentials"
-    }
-    ->
-    exec { 'create-alarm':
-      command => "python ${workdir}/put_metric_alarm.py --namespace ${namespace} --instanceid $(curl -s --connect-timeout 3 http://169.254.169.254/latest/meta-data/instance-id) --config ${workdir}/alarm.yml",
-    }
+  ->
+  exec { 'create-alarm':
+    command => "python ${workdir}/put_metric_alarm.py --namespace ${namespace} --instanceid $(curl -s --connect-timeout 3 http://169.254.169.254/latest/meta-data/instance-id) --config ${workdir}/alarm.yml",
   }
 
 }
