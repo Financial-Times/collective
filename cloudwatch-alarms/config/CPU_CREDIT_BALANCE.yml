@@ -1,0 +1,11 @@
+CPU_CREDIT_BALANCE:
+  Namespace: AWS/EC2
+  Instanceid: get_instanceid()
+  AlarmDescription: CPU Credit Balance is low
+  MetricName: CPUCreditBalance
+  Threshold: 10
+  Statistic: Average
+  ComparisonOperator: LessThanOrEqualToThreshold
+  Dimensions:
+    - Name: InstanceId
+      Value:  get_instanceid()
