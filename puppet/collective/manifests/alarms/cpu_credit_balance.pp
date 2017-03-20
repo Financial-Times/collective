@@ -1,5 +1,5 @@
 class collective::alarms::cpu_credit_balance (
-$namespace,
+$alarmprefix,
 $alarm_threshold  = 10,
 $aws_dir          = '/root/.aws',
 $aws_region       = 'eu-west-1'
@@ -29,13 +29,17 @@ $aws_region       = 'eu-west-1'
   }
   ->
   file { "${workdir}/alarm.yml":
-    content => "cpu_credit_balance:
-      AlarmDescription: CPU Credit balance is low
+    content => "CPU_CREDIT_BALANCE:
+      Namespace: AWS/EC2
+      Instanceid: get_instanceid()
+      AlarmDescription: CPU Credit Balance is low
       MetricName: CPUCreditBalance
-      Threshold: ${alarm_threshold}
+      Threshold: 10
       Statistic: Average
       ComparisonOperator: LessThanOrEqualToThreshold
-      PluginInstance: NONE
+      Dimensions:
+        - Name: InstanceId
+          Value:  get_instanceid()
       ",
   }
   ->
@@ -47,7 +51,7 @@ $aws_region       = 'eu-west-1'
   }
   ->
   exec { 'create-alarm':
-    command => "python ${workdir}/put_metric_alarm.py --namespace ${namespace} --instanceid $(curl -s --connect-timeout 3 http://169.254.169.254/latest/meta-data/instance-id) --config ${workdir}/alarm.yml",
+    command => "python ${workdir}/put_metric_alarm.py --alarmprefix ${alarmprefix} --config ${workdir}/alarm.yml",
   }
 
 }
