@@ -1,0 +1,11 @@
+{
+  "name": "ft-collective",
+  "version": "0.0.1",
+  "author": "ft",
+  "summary": "Create Cloudwatch alarms",
+  "license": "Apache-2.0",
+  "source": "https://github.com/Financial-Times/collective/tree/master/puppet",
+  "project_page": "https://github.com/Financial-Times/collective/tree/master/puppet",
+  "issues_url": "https://github.com/Financial-Times/collective/tree/master/puppet/issues",
+  "dependencies": [ ]
+}

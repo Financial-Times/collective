@@ -28,6 +28,7 @@ $aws_region       = 'eu-west-1'
     unless  => "test -f ${workdir}/common.py"
   }
   ->
+
   file { "${workdir}/alarm.yml":
     content => "CPU_CREDIT_BALANCE:
       Namespace: AWS/EC2
@@ -42,6 +43,7 @@ $aws_region       = 'eu-west-1'
           Value:  get_instanceid()
       ",
   }
+
   ->
   file { "$aws_dir": ensure => directory }
   ->

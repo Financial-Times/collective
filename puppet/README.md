@@ -9,7 +9,7 @@ Creates CloudWatch alams for metrics.
 Creates alarm for CPUCreditBalance metric.
 
 Class parameters
- * $namespace - REQUIRED, defines alarm name prefix, eg. com.ft.membership.ec2
+ * $alarmprefix - REQUIRED, defines alarm name prefix, eg. com.ft.membership.ec2
  * $alarm_threshold - Default value 10, defines numeric threshold for alarm
  * $aws_dir - Default value /root/.aws, defines directory where to store AWS region configuration
 
@@ -18,12 +18,14 @@ Class parameters
 Including class in Puppet manifest
 ```
 class { 'collective::alarms::cpu_credit_balance':
-	namespace => 'com.ft.membership.ec2'
+	alarmprefix => 'com.ft.membership.ec2'
  }
 ```
 Applying class on command line
 
-`puppet apply --modulepath /collective/puppet/ -e "class { 'collective::alarms::cpu_credit_balance': namespace => 'com.ft.membership.ec2' }"`
+`puppet apply --modulepath /collective/puppet/ -e "class { 'collective::alarms::cpu_credit_balance': alarmprefix => 'com.ft.membership.ec2' }"`
+
+
 
 ## Contact info
 
