@@ -49,9 +49,6 @@ $config_file      = false
         ",
     }
   }
-  else {
-
-  }
   ->
   file { "$aws_dir": ensure => directory }
   ->
