@@ -32,7 +32,8 @@ $config_file      = false
     $config_file_path = $config_file
   }
   else {
-  $subclass_name = split($name, '::')[-1]
+  $subclass_list = split($name, '::')
+  $subclass_name = $subclass_list[-1]
   $config_file_path = "${workdir}/${subclass_name}.yml"
     file { "${workdir}/alarm.yml":
       content => "CPU_CREDIT_BALANCE:
