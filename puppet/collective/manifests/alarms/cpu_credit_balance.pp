@@ -27,7 +27,7 @@ $config_file      = false
     command => "curl -s --connect-timeout 3 ${git_endpoint}/common.py > ${workdir}/common.py",
     unless  => "test -f ${workdir}/common.py"
   }
-  ->
+
   if $config_file {
     $config_file_path = $config_file
   }
@@ -47,9 +47,10 @@ $config_file      = false
           - Name: InstanceId
             Value:  get_instanceid()
         ",
+      notify => Exec['create-alarm']
     }
   }
-  ->
+
   file { "$aws_dir": ensure => directory }
   ->
   exec { 'set-aws-region':
