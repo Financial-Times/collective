@@ -2,7 +2,8 @@ class collective::alarms::cpu_credit_balance (
 $alarmprefix,
 $alarm_threshold  = 10,
 $aws_dir          = '/root/.aws',
-$aws_region       = 'eu-west-1'
+$aws_region       = 'eu-west-1',
+$config_file      = false
 ) {
 
   Exec { path => $::path }
@@ -28,22 +29,30 @@ $aws_region       = 'eu-west-1'
     unless  => "test -f ${workdir}/common.py"
   }
   ->
-
-  file { "${workdir}/alarm.yml":
-    content => "CPU_CREDIT_BALANCE:
-      Namespace: AWS/EC2
-      Instanceid: get_instanceid()
-      AlarmDescription: CPU Credit Balance is low
-      MetricName: CPUCreditBalance
-      Threshold: 10
-      Statistic: Average
-      ComparisonOperator: LessThanOrEqualToThreshold
-      Dimensions:
-        - Name: InstanceId
-          Value:  get_instanceid()
-      ",
+  if $config_file {
+    $config_file_path = $config_file
   }
+  else {
+  $subclass_name = split($name, '::')[-1]
+  $config_file_path = "${workdir}/${subclass_name}.yml"
+    file { "${workdir}/alarm.yml":
+      content => "CPU_CREDIT_BALANCE:
+        Namespace: AWS/EC2
+        Instanceid: get_instanceid()
+        AlarmDescription: CPU Credit Balance is low
+        MetricName: CPUCreditBalance
+        Threshold: 10
+        Statistic: Average
+        ComparisonOperator: LessThanOrEqualToThreshold
+        Dimensions:
+          - Name: InstanceId
+            Value:  get_instanceid()
+        ",
+    }
+  }
+  else {
 
+  }
   ->
   file { "$aws_dir": ensure => directory }
   ->
@@ -53,7 +62,7 @@ $aws_region       = 'eu-west-1'
   }
   ->
   exec { 'create-alarm':
-    command => "python ${workdir}/put_metric_alarm.py --alarmprefix ${alarmprefix} --config ${workdir}/alarm.yml",
+    command => "python ${workdir}/put_metric_alarm.py --alarmprefix ${alarmprefix} --config ${config_file_path}",
   }
 
 }

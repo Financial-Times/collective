@@ -1,6 +1,6 @@
 {
   "name": "ft-collective",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "author": "ft",
   "summary": "Create Cloudwatch alarms",
   "license": "Apache-2.0",
