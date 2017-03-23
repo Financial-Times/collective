@@ -10,7 +10,8 @@ class collective::alarms::mock (
     $config_file_path = $config_file
   }
   else {
-    $subclass_name = split($name, '::')[-1]
+    $subclass_list = split($name, '::')
+    $subclass_name = $subclass_list[-1]
     $config_file_path = "config/${subclass_name}.yml"
   }
 
