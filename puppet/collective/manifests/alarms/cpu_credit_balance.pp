@@ -2,7 +2,6 @@ class collective::alarms::cpu_credit_balance (
 $alarmprefix,
 $alarm_threshold  = 10,
 $aws_dir          = '/root/.aws',
-$aws_region       = 'eu-west-1',
 $config_file      = false
 ) {
 

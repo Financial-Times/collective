@@ -9,10 +9,10 @@ Creates CloudWatch alams for metrics.
 Creates alarm for CPUCreditBalance metric.
 
 Class parameters
- * $alarmprefix - REQUIRED, defines alarm name prefix, eg. com.ft.membership.ec2
- * $alarm_threshold - Default value 10, defines numeric threshold for alarm
- * $aws_dir - Default value /root/.aws, defines directory for AWS region configuration
- * config_file - Default value false, use default configuration YAML file.
+ * __alarmprefix__ - REQUIRED, defines alarm name prefix, eg. com.ft.membership.ec2
+ * __alarm_threshold__ - Default value 10, defines numeric threshold for alarm
+ * __aws_dir__ - Default value /root/.aws, defines directory for AWS region configuration
+ * __config_file__ - Default value false, use default configuration YAML file.
    * Specify file path to custom configuration file to override default
 
 #### Usage
