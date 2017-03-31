@@ -1,6 +1,19 @@
 # Collective Puppet module
 
-Creates CloudWatch alams for metrics.  
+Creates CloudWatch alams for metrics.
+
+## Installation
+
+
+### Modulefile / metadata.json
+
+In Puppet module's Modulefile add dependency
+
+`dependency 'ft/collective'`
+
+### Manual installation
+
+`puppet module install ft-collective`
 
 ## Alarms
 
