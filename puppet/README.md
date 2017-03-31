@@ -4,8 +4,17 @@ Creates CloudWatch alams for metrics.
 
 ## Installation
 
+### metadata.json
 
-### Modulefile / metadata.json
+In Puppet module's metadata add dependency
+
+```
+"dependencies": [
+        { "name": "ft/collective" }
+]
+```
+
+### Modulefile
 
 In Puppet module's Modulefile add dependency
 
