@@ -32,10 +32,10 @@ $config_file      = false
     $config_file_path = $config_file
   }
   else {
-  $subclass_list = split($name, '::')
-  $subclass_name = $subclass_list[-1]
-  $config_file_path = "${workdir}/${subclass_name}.yml"
-    file { "${workdir}/alarm.yml":
+    $subclass_list = split($name, '::')
+    $subclass_name = $subclass_list[-1]
+    $config_file_path = "${workdir}/${subclass_name}.yml"
+    file { "${config_file_path}":
       content => "CPU_CREDIT_BALANCE:
         Namespace: AWS/EC2
         Instanceid: get_instanceid()
