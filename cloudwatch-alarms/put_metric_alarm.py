@@ -16,7 +16,7 @@ alarms_file = 'alarms.yml'
 config_is_file = True
 
 def put_metric_alarm(alarmprefix, namepace, instance_id, description, actions, metric_name, threshold, statistic, operator, dimensions):
-    client = boto3.client('cloudwatch')
+    client = boto3.client('cloudwatch', region_name=region_name)
     response = client.put_metric_alarm(
         AlarmName=alarmprefix + "." + instance_id + "." + metric_name,
         AlarmDescription=description + " (InstanceID " + instance_id + ")",
@@ -26,7 +26,7 @@ def put_metric_alarm(alarmprefix, namepace, instance_id, description, actions, m
         ActionsEnabled=True,
         MetricName=metric_name,
         Namespace=namespace,
-        Dimensions=[ dimensions ],
+        Dimensions=dimensions,
         Period=300,
         EvaluationPeriods=1,
         Threshold=threshold,
@@ -48,10 +48,15 @@ parser.add_argument('--namespace', help='[Optional] Metric namespace, eg. com.ft
 parser.add_argument('--instanceid', help='[Optional] InstanceID, eg. i-0fc52a4ca4d81b5b4', required=False)
 parser.add_argument('--topic', help='[Optional] ARN of SNS Topic to send alerts to, eg. arn:aws:sns:eu-west-1:027104099916:SemanticMetadata', required=False)
 parser.add_argument('--config', help='[Optional] File path (./config/alarms.yml) or URL (https://raw.githubusercontent.com/Financial-Times/collective/master/alarms.yml) to alarm configuration YAML file', required=False)
+parser.add_argument('--region', help='[Optional] AWS region, eg. eu-west-1', required=False)
 args = parser.parse_args()
 namespace = args.namespace
 instance_id = args.instanceid
 try:
+    if args.region:
+        region_name = args.region
+    else:
+        region_name = common.metadata_get_region('http://169.254.169.254/latest/meta-data/placement/availability-zone/')
     if args.config: # Check whether --config value is URL or a file
         if re.search("http",args.config):
             common.info("Getting config file from HTTP endpoint " + args.config)
@@ -71,7 +76,7 @@ try:
                 common.info("Using config file " + args.config)
                 with open(args.config, 'r') as ymlfile:
                     cfg = yaml.load(ymlfile)
-                common.info("File " + alarms_file + " loaded")
+                common.info("File " + args.config + " loaded")
             else:
                 common.error("File " + args.config + " not found!")
                 sys.exit(1)
@@ -86,7 +91,7 @@ try:
         elif 'Namespace' in each:
             namespace = each['Namespace']
         else:
-            common.error("Namespace undefined. Use --namespace switch or set namespace key in configuration file")
+            common.error("Namespace of metric to create alarm for undefined. Use --namespace switch or set namespace key in configuration file")
             sys.exit(1)
         if args.instanceid:
             instanceid = args.instanceid

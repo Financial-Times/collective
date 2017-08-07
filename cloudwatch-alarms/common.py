@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import requests
+import requests, sys
 
 ok = '\033[94m'
 endc = '\033[0m'
@@ -38,11 +38,13 @@ def metadata_get_region(url):
     if region:
         return region[:-1]
     else:
+        info("Unable to resolve region from metadata, using default eu-west-1")
         return "eu-west-1"
 
 def process_dimensions(Dimensions):
-    darray={}
+    darray=[]
     for item in Dimensions:
+        #info("Processing Dimensions " + str(item))
         if "()" in item['Value'][-2:]:
             info("Dimensions value is a pointer to function " + item['Value'][:-2])
             try:
@@ -50,7 +52,8 @@ def process_dimensions(Dimensions):
                 item['Value'] = globals()[item['Value'][:-2]]() # To reference function in this module https://ubuntuforums.org/showthread.php?t=1110989
             except Exception, e:
                 error("Unable to load function " + item['Value'][:-2] + " in module common: " + str(e))
-        darray.update(item)
+        darray.append(item)
+    #info("Dimensions list is " + str(darray))
     return darray
 
 def variable_processor(var):
