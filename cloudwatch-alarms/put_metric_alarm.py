@@ -15,11 +15,17 @@ import common
 alarms_file = 'alarms.yml'
 config_is_file = True
 
-def put_metric_alarm(alarmprefix, namepace, instance_id, description, actions, metric_name, threshold, statistic, operator, dimensions):
+def put_metric_alarm(alarmprefix, namepace, description, actions, metric_name, threshold, statistic, operator, dimensions):
+    # Construct string out of dimensions and append it to alarm name
+    str_dimensions = ''
+    for list_item in dimensions:
+        str_dimensions = str_dimensions + "." + list_item['Value']
+    common.info("Alarm name: " + alarmprefix + "." + metric_name + str_dimensions)
+    
     client = boto3.client('cloudwatch', region_name=region_name)
     response = client.put_metric_alarm(
-        AlarmName=alarmprefix + "." + instance_id + "." + metric_name,
-        AlarmDescription=description + " (InstanceID " + instance_id + ")",
+        AlarmName=alarmprefix + "." + metric_name + str_dimensions,
+        AlarmDescription=description,
         OKActions=actions,
         AlarmActions=actions,
         InsufficientDataActions=actions,
@@ -35,10 +41,10 @@ def put_metric_alarm(alarmprefix, namepace, instance_id, description, actions, m
     )
     for each in response.itervalues():
         if each['HTTPStatusCode'] == 200:
-            common.info("Alarm " + alarmprefix + "." + instance_id + "." + metric_name + " created")
+            common.info("Alarm " + alarmprefix + "." + metric_name + str_dimensions + " created")
             return True
         else:
-            common.error("Failed to create alarm " + alarmprefix + "." + instance_id + "." + metric_name)
+            common.error("Failed to create alarm " + alarmprefix + "." + metric_name + str_dimensions)
             return False
     pprint.pprint(response)
 
@@ -94,25 +100,21 @@ try:
             common.error("Namespace of metric to create alarm for undefined. Use --namespace switch or set namespace key in configuration file")
             sys.exit(1)
         if args.instanceid:
-            instanceid = args.instanceid
-        elif 'Instanceid' in each:
-            instanceid = common.variable_processor(each['Instanceid'])
-            if not instanceid:
-                instanceid = 'NO_IID'
-        else:
-            instanceid = 'NO_IID'
+            common.info("--instanceid argument is deprecated. Unique characteristics of alarm now extracted from dimensions")
         if args.topic: #Override AlarmActions if --topic is passed in as a parameter
             common.info("Using override topic " + args.topic)
             each['AlarmActions'] = [ args.topic ]
         elif not 'AlarmActions' in each: # Disable email alarms by setting invalid SNS Topic ARN
-            sns_topic = common.construct_invalid_sns_topic()
+            sns_topic = common.construct_invalid_sns_topic(region_name)
             each['AlarmActions'] = [ sns_topic ]
         if "Dimensions" in each:
             dimensions = common.process_dimensions(each['Dimensions'])
+        else:
+            common.error("Unable to find dimensions key for alarm " + str(each))
+            sys.exit(1)
         put_metric_alarm(
         args.alarmprefix,
         namespace,
-        instanceid,
         each['AlarmDescription'],
         each['AlarmActions'],
         each['MetricName'],

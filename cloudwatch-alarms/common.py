@@ -6,12 +6,9 @@ ok = '\033[94m'
 endc = '\033[0m'
 fail = '\033[91m'
 
-def construct_invalid_sns_topic():
-    region_url = 'http://169.254.169.254/latest/meta-data/placement/availability-zone/'
+def construct_invalid_sns_topic(region):
     arn_prefix = 'arn:aws:sns:'
-    region = metadata_get_region(region_url)
     return str(arn_prefix + region + ":" + ":collective_environment_variable_topic_unset")
-
 
 def info(input):
     print '        ' + ok + input + endc
